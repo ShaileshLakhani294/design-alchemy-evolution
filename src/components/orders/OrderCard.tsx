@@ -77,7 +77,6 @@ export const OrderCard = ({ order }: { order: OrderData }) => {
           </div>
         )}
       </div>
-      </div>
     </article>
   );
 };

@@ -73,7 +73,7 @@ const Login = () => {
             <div className="mb-8 text-center">
               <div className="mb-4 flex items-center justify-center gap-3">
                 <AaharamLogo />
-                <span className="text-muted-foreground">+</nspan>
+                <span className="text-muted-foreground">+</span>
                 <TatvaSoftLogo />
               </div>
               <div className="mx-auto mb-6 h-px w-4/5 bg-border" />
