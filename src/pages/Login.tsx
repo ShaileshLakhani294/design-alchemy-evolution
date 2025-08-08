@@ -3,14 +3,32 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import chefIllustration from "@/assets/illustrations/chef.png";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import friesImg from "@/assets/food/fries.jpg";
-import bhelImg from "@/assets/food/bhel.jpg";
-import samosaImg from "@/assets/food/samosa.jpg";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import type { CarouselApi } from "@/components/ui/carousel";
+import { UtensilsCrossed, Sandwich, Coffee } from "lucide-react";
+import { AaharamLogo, TatvaSoftLogo } from "@/components/brand/Wordmarks";
 const Login = () => {
   const navigate = useNavigate();
+  const [api, setApi] = useState<CarouselApi | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const slides = [
+    { title: "Freshly made, every time", Icon: UtensilsCrossed, caption: "Order cafeteria favorites with a tap." },
+    { title: "Quick bites you’ll love", Icon: Sandwich, caption: "Snacks and sandwiches for your break." },
+    { title: "Sip and relax", Icon: Coffee, caption: "Hot beverages to keep you going." },
+  ];
+
+  useEffect(() => {
+    if (!api) return;
+    const onSelect = () => setSelectedIndex(api.selectedScrollSnap());
+    api.on("select", onSelect);
+    const id = setInterval(() => api.scrollNext(), 3000);
+    return () => {
+      api.off("select", onSelect);
+      clearInterval(id);
+    };
+  }, [api]);
 
   return (
     <div className="min-h-screen">
@@ -23,29 +41,40 @@ const Login = () => {
         <aside className="relative hidden bg-secondary md:block">
           <div className="absolute inset-0 rounded-br-[4rem] bg-secondary" />
           <div className="relative z-10 flex h-full flex-col items-center justify-center gap-6 p-10">
-            <Carousel className="w-full max-w-md" opts={{ loop: true }}>
+            <Carousel className="w-full max-w-md" opts={{ loop: true }} setApi={setApi}>
               <CarouselContent>
-                {[{img: friesImg, caption: "Crispy French Fries"}, {img: bhelImg, caption: "Fresh Bhel"}, {img: samosaImg, caption: "Hot Samosa"}].map((s, i) => (
+                {slides.map((s, i) => (
                   <CarouselItem key={i}>
-                    <div className="overflow-hidden rounded-2xl border bg-card/70 p-4 shadow">
-                      <img src={s.img} alt={s.caption} className="aspect-[4/3] w-full rounded-xl object-cover" loading="lazy" />
-                      <div className="mt-3 text-center text-sm font-medium">{s.caption}</div>
+                    <div className="overflow-hidden rounded-2xl border bg-card/70 p-6 shadow text-center">
+                      <div className="text-sm font-medium mb-3">{s.title}</div>
+                      <s.Icon className="mx-auto h-28 w-28 text-primary" aria-hidden="true" />
+                      <div className="mt-4 text-sm text-muted-foreground">{s.caption}</div>
                     </div>
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious />
-              <CarouselNext />
             </Carousel>
+            <div className="mt-4 flex items-center justify-center gap-2">
+              {slides.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => api?.scrollTo(i)}
+                  aria-label={`Go to slide ${i + 1}`}
+                  className={`h-2.5 w-2.5 rounded-full transition-colors ${
+                    selectedIndex === i ? "bg-primary" : "bg-muted"
+                  }`}
+                />
+              ))}
+            </div>
           </div>
         </aside>
         <section className="flex items-center justify-center p-8 md:p-12">
           <div className="w-full max-w-md">
             <div className="mb-8 text-center">
               <div className="mb-4 flex items-center justify-center gap-3">
-                <div className="rounded-full border border-primary/40 px-3 py-1 text-sm font-semibold text-primary" aria-label="aaharam logo">aaharam</div>
-                <span className="text-muted-foreground">+</span>
-                <div className="rounded-md border bg-muted px-3 py-1 text-sm font-medium" aria-label="TatvaSoft logo">TatvaSoft</div>
+                <AaharamLogo />
+                <span className="text-muted-foreground">+</nspan>
+                <TatvaSoftLogo />
               </div>
               <div className="mx-auto mb-6 h-px w-4/5 bg-border" />
               <h2 className="text-3xl font-semibold">Login</h2>

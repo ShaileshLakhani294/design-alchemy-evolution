@@ -2,9 +2,9 @@ import AppLayout from "@/components/layout/AppLayout";
 import { categories, items } from "@/data/menu";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { format, addDays } from "date-fns";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 const Menu = () => {
   const [activeCat, setActiveCat] = useState(categories[0]?.id || "");
   const [selected, setSelected] = useState<Record<string, boolean>>({});
@@ -16,16 +16,7 @@ const Menu = () => {
   return (
     <AppLayout title="Today’s Menu • Cafeteria Admin" description="Plan and select items for today’s menu.">
       <div className="grid gap-6 lg:grid-cols-[260px_1fr_280px]">
-        {/* Left categories */}
         <aside className="space-y-3">
-          <div className="rounded-xl border p-3">
-            <div className="mb-2 flex items-center justify-between">
-              <Button variant="secondary" size="sm" onClick={() => setDate((d) => addDays(d, -1))}>Prev</Button>
-              <div className="text-sm font-medium">{format(date, "PPP")}</div>
-              <Button variant="secondary" size="sm" onClick={() => setDate((d) => addDays(d, 1))}>Next</Button>
-            </div>
-            <Calendar mode="single" selected={date} onSelect={(d) => d && setDate(d)} className="p-3 pointer-events-auto" />
-          </div>
           <div className="space-y-2">
             {categories.map((c) => (
               <button
@@ -43,10 +34,30 @@ const Menu = () => {
 
         {/* Center grid */}
         <section>
-          <div className="mb-4 flex items-center gap-2 overflow-auto rounded-full border p-2 text-sm">
-            {Array.from({ length: 7 }).map((_, idx) => (
-              <div key={idx} className={`rounded-full px-4 py-1 ${idx === 3 ? "bg-secondary" : ""}`}>Mon {idx + 14}</div>
-            ))}
+          <div className="mb-4 flex items-center justify-between gap-2">
+            <Button variant="secondary" size="icon" onClick={() => setDate((d) => addDays(d, -1))} aria-label="Previous day">
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <div className="flex-1 overflow-auto rounded-full border p-2 text-sm">
+              <div className="flex items-center justify-center gap-2">
+                {Array.from({ length: 7 }).map((_, idx) => {
+                  const day = addDays(date, idx - 3);
+                  const isSel = format(day, "yyyy-MM-dd") === format(date, "yyyy-MM-dd");
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => setDate(day)}
+                      className={`rounded-full px-4 py-1 transition-colors ${isSel ? "bg-secondary" : "hover:bg-muted"}`}
+                    >
+                      {format(day, "EEE dd")}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <Button variant="secondary" size="icon" onClick={() => setDate((d) => addDays(d, 1))} aria-label="Next day">
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </div>
 
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">

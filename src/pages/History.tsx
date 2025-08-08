@@ -3,7 +3,7 @@ import { orders as allOrders } from "@/data/orders";
 import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-
+import { items as menuItems } from "@/data/menu";
 
 type Status = "all" | "completed" | "noshow" | "rejected" | "canceled" | "pending";
 
@@ -33,31 +33,30 @@ const History = () => {
 
   return (
     <AppLayout title="Order History • Cafeteria Admin" description="Browse completed, rejected, canceled and no show orders.">
-      <div className="grid gap-6 lg:grid-cols-[240px_1fr_360px]">
-        {/* Left filter with counts */}
-        <aside className="space-y-2">
-          {(["all","completed","noshow","rejected","canceled","pending"] as Status[]).map((s) => (
-            <button
-              key={s}
-              onClick={() => setFilter(s)}
-              className={`flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
-                filter === s ? "bg-secondary text-secondary-foreground" : "hover:bg-muted"
-              }`}
-            >
-              <span className="capitalize">{s}</span>
-              <span className="rounded-full bg-muted px-2 py-0.5 text-xs">{counts[s] ?? 0}</span>
-            </button>
-          ))}
-        </aside>
-
-        {/* Center list with search */}
+      <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+        {/* Center content: search, filters, list */}
         <section className="space-y-3">
           <div className="flex items-center gap-2">
             <Input placeholder="Search by order id or item..." value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
 
+          <div className="flex flex-wrap gap-2">
+            {(["all","completed","noshow","rejected","canceled","pending"] as Status[]).map((s) => (
+              <button
+                key={s}
+                onClick={() => setFilter(s)}
+                className={`rounded-full border px-3 py-1 text-sm transition-colors ${
+                  filter === s ? "bg-secondary text-secondary-foreground" : "hover:bg-muted"
+                }`}
+              >
+                <span className="capitalize">{s}</span>
+                <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs">{counts[s] ?? 0}</span>
+              </button>
+            ))}
+          </div>
+
           <div className="rounded-xl border">
-            <ul>
+            <ul className="divide-y">
               {list.map((o) => (
                 <li key={o.id}>
                   <button
@@ -104,14 +103,22 @@ const History = () => {
 
               <div>
                 <div className="mb-2 font-medium">Items</div>
-                <ul className="space-y-2 text-sm">
-                  {selected.items.map((it, i) => (
-                    <li key={i} className="flex items-center justify-between">
-                      <span>{it.name} × {it.qty}</span>
-                      <span className="text-muted-foreground">{it.modifiers?.join(", ")}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="space-y-2">
+                  {selected.items.map((it, i) => {
+                    const match = menuItems.find((m) => m.name.toLowerCase().includes(it.name.toLowerCase()));
+                    const img = match?.image || "/placeholder.svg";
+                    return (
+                      <div key={i} className="flex items-center gap-3 rounded-lg border p-2">
+                        <img src={img} alt={`${it.name} image`} className="h-12 w-12 rounded object-cover" loading="lazy" />
+                        <div className="flex-1">
+                          <div className="text-sm font-medium">{it.name}</div>
+                          <div className="text-xs text-muted-foreground">{it.modifiers?.join(", ") || ""}</div>
+                        </div>
+                        <div className="text-sm">× {it.qty}</div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
               <div className="border-t pt-3">

@@ -29,6 +29,8 @@ const statusBadge = (status: OrderStatus) => {
       return <Badge className="bg-destructive/10 text-destructive border-destructive/20">Rejected</Badge>;
     case "canceled":
       return <Badge className="bg-status-canceled/10 text-status-canceled border-status-canceled/20">Cancelled</Badge>;
+    case "pending":
+      return <Badge variant="outline" className="bg-secondary/20 text-muted-foreground border-secondary/40">Pending</Badge>;
     default:
       return null;
   }
@@ -40,14 +42,14 @@ export const OrderCard = ({ order }: { order: OrderData }) => {
       {/* Colored header */}
       <div className="flex items-center justify-between bg-secondary/40 px-4 py-3">
         <h3 className="text-sm font-semibold">Order #{order.id}</h3>
-        <div className="flex items-center gap-4 text-sm">
-          <span className="text-muted-foreground">{order.time}</span>
+        <div className="flex items-center gap-3 text-sm">
+          <span className="text-muted-foreground hidden sm:inline">{order.time}</span>
           <span className="font-medium">₹{order.total}</span>
+          <span>{statusBadge(order.status)}</span>
         </div>
       </div>
 
       <div className="p-4">
-        <div className="mb-2">{order.status !== "pending" && statusBadge(order.status)}</div>
         <ul className="space-y-1 text-sm">
           {order.items.map((it, idx) => (
             <li key={idx} className="flex items-start justify-between">
@@ -63,17 +65,18 @@ export const OrderCard = ({ order }: { order: OrderData }) => {
         </ul>
 
         {order.status === "pending" && (
-          <div className="mt-4 flex gap-2">
-            <Button variant="outline" className="flex-1">
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <Button variant="outline" className="border-destructive text-destructive hover:bg-destructive/10">
               Reject
               <XCircle className="ml-2 h-4 w-4" />
             </Button>
-            <Button className="flex-1">
+            <Button>
               Accept
               <CheckCircle2 className="ml-2 h-4 w-4" />
             </Button>
           </div>
         )}
+      </div>
       </div>
     </article>
   );

@@ -21,25 +21,22 @@ const Items = () => {
       <div className="grid gap-6 lg:grid-cols-[260px_1fr_340px]">
         {/* Left category list */}
         <aside className="space-y-3">
-          {baseCategories.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => setActiveCat(c.id)}
-              className={`w-full rounded-xl border px-4 py-3 text-left transition-colors ${
-                activeCat === c.id ? "bg-secondary text-secondary-foreground" : "hover:bg-muted"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <img
-                  src={baseItems.find((i) => i.categoryId === c.id)?.image || baseItems[0]?.image}
-                  alt={`${c.name} icon`}
-                  className="h-8 w-8 rounded object-cover"
-                  loading="lazy"
-                />
-                <span>{c.name}</span>
-              </div>
-            </button>
-          ))}
+          {baseCategories.map((c) => {
+            const preview = baseItems.find((i) => i.categoryId === c.id)?.image || baseItems[0]?.image;
+            const active = activeCat === c.id;
+            return (
+              <button
+                key={c.id}
+                onClick={() => setActiveCat(c.id)}
+                className={`w-full overflow-hidden rounded-xl border text-left shadow-sm transition-all hover:shadow-md ${
+                  active ? "ring-2 ring-primary" : ""
+                }`}
+              >
+                <img src={preview} alt={`${c.name} preview`} className="aspect-[3/2] w-full object-cover" loading="lazy" />
+                <div className="p-3 text-center text-sm font-medium">{c.name}</div>
+              </button>
+            );
+          })}
         </aside>
 
         {/* Middle items list */}
